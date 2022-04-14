@@ -23,14 +23,15 @@ func main()  {
 
 	//创建项目main.go文件
 	file := createFile(projectAddr, "/main.go")
-	genMain := NewGenerate(file)
+	genMain := NewGenerate(file,packageName)
 	genMain.writeMainFile()
 
 	//创建启动器
 	bootAddr :=createDir(projectAddr,"bootstrap")
 	bootFile := createFile(bootAddr, "/bootstrap.go")
-	genBoot := NewGenerate(bootFile)
+	genBoot := NewGenerate(bootFile,packageName)
 	genBoot.writeBootFile()
+
 }
 
 //根据所给文件夹路径创建文件夹
@@ -75,30 +76,15 @@ func createFile(proAddr,fileName string) *os.File {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 type Generate struct {
 	File *os.File
+	PName string
 }
 
-func NewGenerate(file *os.File) *Generate {
+func NewGenerate(file *os.File,packageName string) *Generate {
 	return &Generate{
 		File: file,
+		PName:packageName,
 	}
 }
 
@@ -110,6 +96,23 @@ func (g *Generate)writeBootFile()  {
 	//生成包名
 	g.p("package bootstrap")
 	g.p("\n")
+	g.p("\n")
+	//生成引入文件
+	g.p("import (")
+	g.p("\n\t")
+	g.p(fmt.Sprintf("\"%s/config\"",g.PName))
+	g.p("\n\t")
+	g.p(fmt.Sprintf("\"%s/db\"",g.PName))
+	g.p("\n\t")
+	g.p(fmt.Sprintf("\"%s/route\"",g.PName))
+	g.p("\n\t")
+	g.p(fmt.Sprintf("\"github.com/gin-gonic/gin\""))
+	g.p("\n\t")
+	g.p(fmt.Sprintf("\"github.com/spf13/viper\""))
+	g.p("\n\t")
+	g.p(fmt.Sprintf("\"sync\""))
+	g.p("\n")
+	g.p(")")
 	g.p("\n")
 	//生成全局变量once
 	g.p("var once sync.Once")
